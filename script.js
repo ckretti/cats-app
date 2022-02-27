@@ -1,20 +1,25 @@
 const infoBlock = document.querySelector(".info-block");
 function showInfo(catData) {
     infoBlock.classList.add("active");
-    infoBlock.firstElementChild.innerHTML = `
-        <img class="info-img" src="${catData.img_link}" alt="${catData.name}">
-        <div class="information">
-            <h2>${catData.name}</h2>
-            <h3>${catData.age} ${buildYearDescription(catData.age)}</h3>
-            <p>${catData.description}</p>
-            <div class="information-action-buttons-block">
-                <button class="icon-button" title="Удалить котика" onclick="onDeleteCat(${catData.id})">
-                    <i class="fa fa-trash fa-lg" aria-hidden="true"></i>
-                </button>
+    infoBlock.innerHTML = `
+        <div class="info-wrapper">
+            <img class="info-img" src="${catData.img_link}" alt="${catData.name}">
+            <div class="information">
+                <h2>${catData.name}</h2>
+                <h3>${catData.age} ${buildYearDescription(catData.age)}</h3>
+                <p>${catData.description}</p>
+                <div class="information-action-buttons-block">
+                    <button class="icon-button" title="Редактировать котика" onclick="onEditCat(${catData.id})">
+                        <i class="fa fa-edit fa-lg" aria-hidden="true"></i>
+                    </button>
+                    <button class="icon-button" title="Удалить котика" onclick="onDeleteCat(${catData.id})">
+                        <i class="fa fa-trash fa-lg" aria-hidden="true"></i>
+                    </button>
+                </div>
             </div>
+            
+            <div class="info-close" onclick="closeInfo()"></div>
         </div>
-        
-        <div class="info-close" onclick="closeInfo()"></div>
     `;
 }
 
@@ -95,6 +100,10 @@ function refreshCats() {
 }
 
 async function onDeleteCat(id) {
+    const shouldDeleteCat = confirm('Удалить котика?');
+    if (!shouldDeleteCat) {
+        return;
+    }
     const result = await fetch(`https://sb-cats.herokuapp.com/api/delete/${id}`, {
         method: 'DELETE'
     });
@@ -102,4 +111,45 @@ async function onDeleteCat(id) {
         refreshCats();
         closeInfo();
     }
+}
+
+function onEditCat(id) {
+    console.log(id);
+}
+
+function showAddCatForm() {
+    infoBlock.classList.add("active");
+    infoBlock.innerHTML = `
+        <div class="form__container">
+            <h2>Добавить котика</h2>
+            <div class="info-close" onclick="closeInfo()"></div>
+            <form>
+                <div class="form__group">
+                    <label for="name">Имя котика</label>
+                    <input type="text" id="name">
+                </div>
+                <div class="form__group">
+                    <label for="age">Возраст</label>
+                    <input type="text" id="age">
+                </div>
+                <div class="form__group">
+                    <label for="rate">Рейтинг</label>
+                    <input type="text" id="rate">
+                </div>
+                <div class="form__group">
+                    <label for="description">Описание</label>
+                    <input type="text" id="description">
+                </div>
+                <div class="form__group">
+                    <label for="img_link">Ссылка на фото</label>
+                    <input type="text" id="img_link">
+                </div>
+
+                <button class="form__submit" type="submit">
+                    Добавить
+                    <i class="fa fa-paper-plane fa-lg" aria-hidden="true"></i>
+                </button>
+            </form>
+        </div>
+    `;
 }
