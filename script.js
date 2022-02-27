@@ -122,8 +122,8 @@ function showAddCatForm() {
     infoBlock.innerHTML = `
         <div class="form__container">
             <h2>Добавить котика</h2>
-            <div class="info-close" onclick="closeInfo()"></div>
-            <form>
+            <div class="info-close" onclick="closeInfo();return false;"></div>
+            <form id="cat-form" onsubmit="onAddCat(this)">
                 <div class="form__group">
                     <label for="name">Имя котика</label>
                     <input type="text" id="name">
@@ -152,4 +152,43 @@ function showAddCatForm() {
             </form>
         </div>
     `;
+
+    const catForm = document.querySelector('#cat-form');
+    catForm.onsubmit = onAddCat;
+}
+
+async function onAddCat(e) {
+    e.preventDefault();
+
+    const elements = Array.from(e.currentTarget);
+
+    const state = elements.reduce((acc, el) => {
+        if (el.id) {
+            acc[el.id] = el.value;
+        }
+
+        return acc;
+    }, {});
+
+    const idsResponse = await fetch('https://sb-cats.herokuapp.com/api/ids');
+    const jsonIds = await idsResponse.json();
+    const maxId = Array.from(jsonIds.data).filter(x => !!x).reduce((acc, cur) => acc > cur ? arr : cur, 0);
+
+    const body = JSON.stringify({
+        ...state,
+        favourite: false,
+        __v: 0,
+        id: maxId + 1
+    });
+
+    const result = await fetch('https://sb-cats.herokuapp.com/api/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: body
+    });
+    console.log(result);
+    closeInfo();
+    refreshCats();
 }
