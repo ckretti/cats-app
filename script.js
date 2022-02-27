@@ -9,7 +9,7 @@ function showInfo(catData) {
                 <h3>${catData.age} ${buildYearDescription(catData.age)}</h3>
                 <p>${catData.description}</p>
                 <div class="information-action-buttons-block">
-                    <button class="icon-button" title="Редактировать котика" onclick="onEditCat(${catData.id})">
+                    <button class="icon-button" title="Редактировать котика" onclick="showEditCatForm(${catData.id})">
                         <i class="fa fa-edit fa-lg" aria-hidden="true"></i>
                     </button>
                     <button class="icon-button" title="Удалить котика" onclick="onDeleteCat(${catData.id})">
@@ -160,15 +160,7 @@ function showAddCatForm() {
 async function onAddCat(e) {
     e.preventDefault();
 
-    const elements = Array.from(e.currentTarget);
-
-    const state = elements.reduce((acc, el) => {
-        if (el.id) {
-            acc[el.id] = el.value;
-        }
-
-        return acc;
-    }, {});
+    const state = buildFormState(e.currentTarget);
 
     const idsResponse = await fetch('https://sb-cats.herokuapp.com/api/ids');
     const jsonIds = await idsResponse.json();
@@ -181,14 +173,94 @@ async function onAddCat(e) {
         id: maxId + 1
     });
 
-    const result = await fetch('https://sb-cats.herokuapp.com/api/add', {
+    await fetch('https://sb-cats.herokuapp.com/api/add', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json;charset=utf-8'
         },
         body: body
     });
-    console.log(result);
     closeInfo();
     refreshCats();
+}
+
+function showEditCatForm(id) {
+    const cat = catsData.find(x => x.id === id);
+
+    infoBlock.classList.add("active");
+    infoBlock.innerHTML = `
+        <div class="form__container">
+            <h2>Добавить котика</h2>
+            <div class="info-close" onclick="closeInfo();return false;"></div>
+            <form id="cat-form" onsubmit="onAddCat(this)">
+                <div class="form__group">
+                    <label for="name">Имя котика</label>
+                    <input type="text" id="name" value=${cat.name}>
+                </div>
+                <div class="form__group">
+                    <label for="age">Возраст</label>
+                    <input type="text" id="age" value=${cat.age}>
+                </div>
+                <div class="form__group">
+                    <label for="rate">Рейтинг</label>
+                    <input type="text" id="rate" value=${cat.rate}>
+                </div>
+                <div class="form__group">
+                    <label for="description">Описание</label>
+                    <input type="text" id="description" value=${cat.description}>
+                </div>
+                <div class="form__group">
+                    <label for="img_link">Ссылка на фото</label>
+                    <input type="text" id="img_link" value=${cat.img_link}>
+                </div>
+                <input type="text" id="id" value=${cat.id} hidden>
+
+                <button class="form__submit" type="submit">
+                    Обновить
+                    <i class="fa fa-paper-plane fa-lg" aria-hidden="true"></i>
+                </button>
+            </form>
+        </div>
+    `;
+
+    const catForm = document.querySelector('#cat-form');
+    catForm.onsubmit = onEditCat;
+}
+
+async function onEditCat(e) {
+    e.preventDefault();
+
+    const state = buildFormState(e.currentTarget);
+
+    const cat = catsData.find(x => x.id === state.id);
+
+    const body = JSON.stringify({
+        ...cat,
+        ...state
+    });
+
+    await fetch(`https://sb-cats.herokuapp.com/api/update/${state.id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        body: body
+    });
+
+    closeInfo();
+    refreshCats();
+}
+
+function buildFormState(target) {
+    const elements = Array.from(target);
+
+    const state = elements.reduce((acc, el) => {
+        if (el.id) {
+            acc[el.id] = el.value;
+        }
+
+        return acc;
+    }, {});
+
+    return state;
 }
