@@ -7,7 +7,13 @@ function showInfo(catData) {
             <h2>${catData.name}</h2>
             <h3>${catData.age} ${buildYearDescription(catData.age)}</h3>
             <p>${catData.description}</p>
+            <div class="information-action-buttons-block">
+                <button class="icon-button" title="Удалить котика" onclick="onDeleteCat(${catData.id})">
+                    <i class="fa fa-trash fa-lg" aria-hidden="true"></i>
+                </button>
+            </div>
         </div>
+        
         <div class="info-close" onclick="closeInfo()"></div>
     `;
 }
@@ -45,16 +51,16 @@ async function init() {
     catsData.forEach(catData => {
         getItem(catData);
     });
+
+    const cards = document.getElementsByClassName("card");
+    for (let index = 0; index < cards.length; index++) {
+        cards[index].addEventListener("click", function () {
+            showInfo(catsData[index]);
+        })
+    }
 }
 
 init();
-
-const cards = document.getElementsByClassName("card");
-for (let index = 0; index < cards.length; index++) {
-    cards[index].addEventListener("click", function () {
-        showInfo(catsData[index]);
-    })
-}
 
 function renderRate(rateValue) {
     const fill = "<img src='assets/cat-fill.svg' alt='^_^'>"
@@ -86,4 +92,14 @@ function refreshCats() {
     main.innerHTML = '';
     localStorage.removeItem('catsData');
     init();
+}
+
+async function onDeleteCat(id) {
+    const result = await fetch(`https://sb-cats.herokuapp.com/api/delete/${id}`, {
+        method: 'DELETE'
+    });
+    if (result.ok) {
+        refreshCats();
+        closeInfo();
+    }
 }

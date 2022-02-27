@@ -149,3 +149,15 @@ footer {
 .information h3 {
     margin-bottom: 30px;
 }
+
+.information-action-buttons-block {
+    position: absolute;
+    right: 15px;
+    bottom: 15px;
+}
+
+.icon-button {
+    background: white;
+    border: none;
+    cursor: pointer;
+}

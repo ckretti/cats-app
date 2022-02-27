@@ -7,13 +7,22 @@
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="assets/logo.png">
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"></script> -->
 </head>
 
 <body>
     <header class="container">
         <img class="logo-img" src="assets/cat-fill.svg" alt="Бабуленькины котики">
-        <button onclick="refreshCats()">Обновить котиков</button>
-        <span class="logo-text">Бабуленькины котики</span>
+        <div>
+            <button class="icon-button" title="Добавить котика" onclick="refreshCats()">
+                <i class="fa fa-add fa-lg" aria-hidden="true"></i>
+            </button>
+            <button class="icon-button" title="Перезаписать котиков в локал сторадж" onclick="refreshCats()">
+                <i class="fa fa-refresh fa-lg" aria-hidden="true"></i>
+            </button>
+            <span class="logo-text">Бабуленькины котики</span>
+        </div>
     </header>
     <main class="container"></main>
     <footer class="container">©2022 All rights reserved</footer>
